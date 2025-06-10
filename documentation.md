@@ -10,7 +10,10 @@ The Earth Engine API is provided in Python and JavaScript. These APIs are simple
 In this guide the web-based Earth Engine code editor is used to create earth engine apps, simple GUI based web applications that are easy to deploy and share. The Earth Engine code editor is an online IDE (Integrated development environment) that allows the development of JavaScript earth engine algorithms and the visualisation of the resulting data on the integrated map. It also allows final data products to be exported in standard formats such as GeoTIFFs which can be used in desktop GIS applications like QGIS and ArcGIS.
 
 ## Getting Started
-To get started, you will need a Google account. Navigate to the [Getting Started](https://code.earthengine.google.com/register) page and sign in with your Google account. Then proceed through the 
+To get started, you will need a Google account. Navigate to the [Getting Started](https://code.earthengine.google.com/register) page and sign in with your Google account. Then proceed through the setup process and complete the form to apply for free non-commercial use.
+
+Once you get through the setup process
+
 ```javascript
 // Load and process Landsat 8 data
 var images = ee.ImageCollection("LANDSAT/LC08/C02/T1_L2")
