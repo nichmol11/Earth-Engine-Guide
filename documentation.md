@@ -209,18 +209,23 @@ To begin the export simply click the run button. A new popup window will appear 
 
 ![View of the earth engine task popup](EE_export_popup.png)
 
-*Note if you plan to export a very large raster (more than 10,000 by 10,000 pixels or in spatial terms, 300 by 300 km at Landsat's maximum resolution) then the output raster will be automatically split into smaller individual parts by Earth Engine. In this case, it makes sense to create a new folder to hold all the individual component rasters. Thankfully, there are tools in ArcGIS and QGIS to mosaic these indiviudal rasters back together.*
+*Note if you plan to export a very large raster (more than 10,000 by 10,000 pixels or in spatial terms, 300 by 300 km at Landsat's maximum resolution) then the output raster will be automatically split into smaller individual parts by Earth Engine. In this case, it makes sense to create a new folder to hold all the individual component rasters. Thankfully, there are tools in ArcGIS and QGIS which enable us to easily mosaic these indiviudal raster sections back together.*
 
-When you click run...
+When you click run the export process will begin. This can take anywhere from seconds to 30 minutes or more depending on the spatial extent and resolution of the output and the complexity of the calculations required to compute the value of each cell.
 
 ## Building a basic UI
+We can add UI elements to make our Earth Engine applications dynamic and to allow users to interact with the data without needing to write any code themselves.
+
+### Adding a switch/button
+We can easily add simple switches and buttons that allow the user to switch back and forth between two or more different layers.
 
 ## Publishing an Earth Engine App
 In order to make our algorithms more accessible (including for users without them needing an Earth Engine account), we can publish our script as an Earth Engine app. 
 
 ## More Information
-Here are some more useful resources related to Earth Engine including official documentation and tutorial videos.
+There are many useful resources and tutorial videos about Google Earth engine available online. Here are a few useful general resources including official documentation and tutorial videos:
 - [Official Google Guide: Getting started with Google Earth Engine](https://developers.google.com/earth-engine/guides/getstarted)
-- 
+- [Introduction to Google Earth Engine | Official Google Workshop Tutorial Playlist from 2023 Geo for Good Summit](https://www.youtube.com/playlist?list=PLLW-qoCMKQsx62nKon2-0PMtGzkxlwN7k)
+- [Google Earth Engine 101: An Introduction for Complete Beginners | Tutorial Video by Stanford Geospatial Center](https://www.youtube.com/watch?v=oAElakLgCdA)
 
 
