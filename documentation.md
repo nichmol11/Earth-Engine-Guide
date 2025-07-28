@@ -217,7 +217,172 @@ When you click run the export process will begin. This can take anywhere from se
 We can add UI elements to make our Earth Engine applications dynamic and to allow users to interact with the data without needing to write any code themselves.
 
 ### Adding a switch/button
-We can easily add simple switches and buttons that allow the user to switch back and forth between two or more different layers.
+We can easily add simple switches and buttons to the UI. These can be used to perform different functions, fot example to allow the user to switch back and forth between multiple layers on the map.
+```js
+//Adding a button to the UI
+var button = ui.Button({
+  label: 'Button Label',
+  onClick: function() {
+    //Code to be executed on button press goes here
+  } 
+});
+```
+Lets add some buttons to allow the user to easily change which layer is currently been displayed on the map. 
+
+We can start by rewriting our code so that instead of adding each of our layers to the map we instead generate their parameters and store them in an array. When the user wants to display a given layer we simply pass those parameters to a function which adds the given layer. This way we don't need to wait to load all the layers the user may want to look at, instead we only load the specific layer the user wants to look at currently. Lets make the generateLayers function work for any year, so we can simply pass in the year we want and generate the layers for the given year. This will come in handy in the next section.
+
+``` js
+//Array to store the parameters for the different layers
+var layers = [];
+
+//Function to generate the parameters for each layer for a given year
+function generateLayers(year) {
+  var startDate = year + '01-01';
+  var endDate = year + '12-31';
+
+  /*This pattern sets the collection we want to use depending on the year
+   * If the year is less than 2014, we'll use the the Landsat 7 collection, otherwise
+   * we will use the Landsat 8 collection. Note how this pattern is implemented several
+   * times in the code. */
+  var imgCol = year < 2014 ? "LANDSAT/LE07/C02/T1_L2" : "LANDSAT/LC08/C02/T1_L2";
+
+  var images = ee.ImageCollection(imgCol)
+  .filterDate(startDate, endDate)
+  .filter(ee.Filter.lt('CLOUD_COVER', 20))
+  .sort('system:time_start');
+
+  var imgsCorr = images.map(scaleBands);
+  var NDVIcol = year < 2014 ? imgsCorr.map(calcNDVIL7) : imgsCorr.map(calcNDVIL8);
+
+  //Populate the layers array with the layer parameters
+  layers = [
+    {
+      name: "Landsat " + (year < 2014 ? "7 " : "8 ") + "true colour",
+      image: imgsCorr.median().select(year < 2014 ? ['SR_B3','SR_B2','SR_B1'] : ['SR_B4','SR_B3','SR_B2']),
+      visParams: {bands: (year < 2014 ? ['SR_B3','SR_B2','SR_B1'] : ['SR_B4','SR_B3','SR_B2']), min: 0, max: 0.2}
+    },
+    {
+      name: "Landsat " + (year < 2014 ? "7 " : "8 ") + "false colour",
+      image: imgsCorr.median().select(year < 2014 ? ['SR_B4','SR_B3','SR_B2'] : ['SR_B5','SR_B4','SR_B3']),
+      visParams: {bands: (year < 2014 ? ['SR_B4','SR_B3','SR_B2'] : ['SR_B4','SR_B3','SR_B2']), min: 0, max: 0.3}
+    },
+    {
+      name: "Landsat " + (year < 2014 ? "7 " : "8 ") + "NDVI",
+      image: NDVIcol.median().select('NDVI'),
+      visParams: {min: -1, max: 1, palette: ['blue', 'white', 'green']}
+    }
+  ];
+}
+
+//For now lets just use 2024
+generateLayers(2024);
+
+// Add the default layer before the user clicks any buttons (true colour)
+Map.addLayer(layers[0].image, layers[0].visParams, layers[0].name);
+```
+
+Lets write a function to add a given layer to the map and clear the existing layer. Writing a function means we don't need to repeat this code for each button, we just need to change the index in the layer array we're selecting (Index 0 in the array is true colour, Index 1 is false colour near-infrared and Index 2 is NDVI). 
+``` js
+/* Variable to keep track of what layer is currently being displayed.
+This will come in handy when we add the ability to switch year, 
+so the selected view doesn't change when the year changes */
+var currentIndex = 0;
+
+//Function to add the selected layer to the map and clear the existing layers
+function updateMapLayers(selectedIndex) {
+  // Clear and update map layer
+  Map.layers().reset();
+  var layer = layers[selectedIndex];
+  currentIndex = selectedIndex;
+  Map.addLayer(layer.image, layer.visParams, layer.name);
+}
+```
+Okay, now we've written the supporting logic we can add the buttons themselves.
+``` js
+//Add a button to switch to true colour
+var button = ui.Button({
+  label: 'True Colour View',
+  onClick: function() {
+    //Update the map with the first layer in the array (true colour)
+    updateMapLayers(0);
+  } 
+});
+
+//Add a button to switch to false colour near-infrared
+var button = ui.Button({
+  label: 'False Colour View',
+  onClick: function() {
+    //Update the map with the second layer in the array (false colour near-infrared)
+    updateMapLayers(1);
+  } 
+});
+
+//Add a button to switch to NDVI view
+var button = ui.Button({
+  label: 'NDVI View',
+  onClick: function() {
+    //Update the map with the third layer in the array (NDVI)
+    updateMapLayers(2);
+  } 
+});
+```
+
+Nice! This code should work nicely. Now how can we allow the user to choose which year they want?
+
+### Adding a slider widget
+We can also add a slider that allows the user to choose a specified numeric input from a given range we define. We can use this to allow the user to choose which year's data they want to look at. To add a slider, the basic code is as follows:
+```js
+//Add a slider
+var slider = ui.Slider();
+slider.onChange(function(value) {
+  //Code to be executed on slider change goes here
+});
+```
+We can modify the slider's behaviour by passing values to it when we initialise it.
+```js
+var slider = ui.Slider(/*input parameters to modify slider go here*/)
+```
+Note the input parameters shown below. 
+![Input arguments for the slider widget](slider_properties.png)
+So to create a slider that allows values between 2000 and 2024, with a minimum step of 1 we would do this:
+```js
+//Add a slider that allows whole numbers between 2000 and 2024 with a default value of 2024
+var slider = ui.Slider({
+  min: 2000,
+  max: 2024,
+  step: 1,
+  value: 2024
+});
+```
+Now we can write the logic to update the layers. We've already done most of the work so this is easy. We call the updateMapLayers() function again, using the currentIndex value we created earlier so the selected view stays the same when the year changes.
+```js
+slider.onChange(function(value) {
+  //Generate the layers for the given year
+  generateLayers(value);
+  //Update the current view to the given year
+  updateMapLayers(currentIndex)
+});
+```
+### Adding a label
+Another useful Google Earth widget is the label widget. We might want to let the user easily see which view and which year they are currently viewing. We can use a label to do this by dynamically updating its text when the year/view changes. We add a label like this:
+```js
+//Add a basic label
+var label = ui.Label('Basic Label');
+```
+
+We can dynamically update the text using the .setValue() function.
+```js
+//Update the labels text
+label.setValue("Updated Label");
+```
+
+By implementing this functionality in the updateMapLayers() function we can change the text when the current view changes.
+
+### More widgets
+There are several more UI widgets avaialble such as date sliders, check boxes and text inputs. [Read about them in the official documentation](https://developers.google.com/earth-engine/guides/ui_widgets).
+
+### Arranging UI elements
+Google Earth Engine allows us to modify our app's layout and choose where to place our UI elements.
 
 ## Publishing an Earth Engine App
 In order to make our algorithms more accessible (including for users without them needing an Earth Engine account), we can publish our script as an Earth Engine app. 
