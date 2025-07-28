@@ -63,7 +63,7 @@ Map.addLayer(ndviImgs.median(), {min: -1, max: 1, palette: ['blue', 'white', 'gr
 */
 
 
-
+/*
 //Export the median NDVI image clipped to the AOI polygon
 Export.image.toDrive({
   image: ndviImgs.median(),
@@ -77,6 +77,7 @@ Export.image.toDrive({
     noData: -9999,
   }
 });
+*/
 
 //Building UI elements for app
 
@@ -88,8 +89,8 @@ var currentYear = 2024;
 //Function to generate the parameters for each layer for a given year
 function generateLayers(year) {
   currentYear = year;
-  var startDate = year + '01-01';
-  var endDate = year + '12-31';
+  var startDate = year + '-01-01';
+  var endDate = year + '-12-31';
 
   var imgCol = year < 2014 ? "LANDSAT/LE07/C02/T1_L2" : "LANDSAT/LC08/C02/T1_L2";
 

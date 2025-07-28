@@ -217,7 +217,7 @@ When you click run the export process will begin. This can take anywhere from se
 We can add UI elements to make our Earth Engine applications dynamic and to allow users to interact with the data without needing to write any code themselves.
 
 ### Adding a switch/button
-We can easily add simple switches and buttons to the UI. These can be used to perform different functions, fot example to allow the user to switch back and forth between multiple layers on the map.
+We can easily add simple switches and buttons to the UI. These can be used to perform different functions, fot example to allow the user to switch back and forth between multiple layers on the map. The basic code to initialise a button is as follows:
 ```js
 //Adding a button to the UI
 var button = ui.Button({
@@ -227,6 +227,11 @@ var button = ui.Button({
   } 
 });
 ```
+We also need to decide where to put the button in the UI. This will be covered alter on, for now we can simply put the button variable in a print statement. This will place the button within the console panel of Earth Engine.
+``` js
+print(button);
+```
+
 Lets add some buttons to allow the user to easily change which layer is currently been displayed on the map. 
 
 We can start by rewriting our code so that instead of adding each of our layers to the map we instead generate their parameters and store them in an array. When the user wants to display a given layer we simply pass those parameters to a function which adds the given layer. This way we don't need to wait to load all the layers the user may want to look at, instead we only load the specific layer the user wants to look at currently. Lets make the generateLayers function work for any year, so we can simply pass in the year we want and generate the layers for the given year. This will come in handy in the next section.
@@ -300,7 +305,7 @@ function updateMapLayers(selectedIndex) {
 Okay, now we've written the supporting logic we can add the buttons themselves.
 ``` js
 //Add a button to switch to true colour
-var button = ui.Button({
+var buttonTrueColour = ui.Button({
   label: 'True Colour View',
   onClick: function() {
     //Update the map with the first layer in the array (true colour)
@@ -309,7 +314,7 @@ var button = ui.Button({
 });
 
 //Add a button to switch to false colour near-infrared
-var button = ui.Button({
+var buttonFalseColour = ui.Button({
   label: 'False Colour View',
   onClick: function() {
     //Update the map with the second layer in the array (false colour near-infrared)
@@ -318,13 +323,18 @@ var button = ui.Button({
 });
 
 //Add a button to switch to NDVI view
-var button = ui.Button({
+var buttonNDVI = ui.Button({
   label: 'NDVI View',
   onClick: function() {
     //Update the map with the third layer in the array (NDVI)
     updateMapLayers(2);
   } 
 });
+
+//Add the buttons to the console
+print(buttonTrueColour);
+print(buttonFalseColour);
+print(buttonNDVI);
 ```
 
 Nice! This code should work nicely. Now how can we allow the user to choose which year they want?
@@ -353,6 +363,9 @@ var slider = ui.Slider({
   step: 1,
   value: 2024
 });
+
+//Add the slider to the console panel
+print(slider);
 ```
 Now we can write the logic to update the layers. We've already done most of the work so this is easy. We call the updateMapLayers() function again, using the currentIndex value we created earlier so the selected view stays the same when the year changes.
 ```js
@@ -376,7 +389,7 @@ We can dynamically update the text using the .setValue() function.
 label.setValue("Updated Label");
 ```
 
-By implementing this functionality in the updateMapLayers() function we can change the text when the current view changes.
+By implementing this functionality in the updateMapLayers() function we can change the text when the current view changes. We can easily add this functionality to our app by calling the label.setValue() function within the updateMapLayers() function.
 
 ### More widgets
 There are several more UI widgets avaialble such as date sliders, check boxes and text inputs. [Read about them in the official documentation](https://developers.google.com/earth-engine/guides/ui_widgets).
