@@ -395,10 +395,94 @@ By implementing this functionality in the updateMapLayers() function we can chan
 There are several more UI widgets avaialble such as date sliders, check boxes and text inputs. [Read about them in the official documentation](https://developers.google.com/earth-engine/guides/ui_widgets).
 
 ### Arranging UI elements
-Google Earth Engine allows us to modify our app's layout and choose where to place our UI elements.
+For now we've just been putting our widgets into the console using the print() function. There are however cleaner ways to arrange elements and it is possible to create a custom UI. Google Earth Engine allows us to modify our app's layout and choose where to place our UI elements. We arrange custom UI elements by placing them in containers called panels. We create a panel like this:
+```js
+// Create a UI panel and define its styling
+var panel = ui.Panel({
+  layout: ui.Panel.Layout.flow('vertical'), 
+  style: {
+    width: '400px',
+    padding: '20px'
+  }});
+```
+Here, I make it so the widgets will be stacked vertically in the panel and set the style of the panel so it will be 400 pixels wide and have a padding of 20 px.
+
+To add the panel to our UI we simply do this:
+```js
+// Add the panel to the ui
+ui.root.add(panel);
+```
+
+Now if we run this we will just get a blank panel. Now we need to add the widgets we made to the panel. First of, make sure to remove all the print() statements we used to print the widgets to the console, since we cannot render widgets in multiple places. To add our widgets we simply pass in an array with the names of the widgets we want to add:
+
+```js
+// Define panel styling
+var panel = ui.Panel({
+  layout: ui.Panel.Layout.flow('vertical'), 
+  style: {
+    width: '400px',
+    padding: '20px'
+  },
+  widgets: [
+    label
+    slider,
+    checkbox,
+    buttonTrueColour,
+    buttonFalseColour,
+    buttonNDVI
+  ]
+});
+```
+Now, this should be starting to look nice, but I would like to centre all the items in the panel so it looks a bit nicer. We can do this simply by wrapping each of the widgets in their own panel within the main panel:
+```js
+  widgets: [
+    // Wrap each widget in a small panel with margin: '0 auto' to center it
+    ui.Panel(label, null, {margin: '0 auto'}), // Centering the label
+    ui.Panel(slider, null, {margin: '0 auto'}), // Centering the slider
+    ui.Panel(checkbox, null, {margin: '0 auto'}), // Centering the checkbox
+    ui.Panel(buttonTrueColour, null, {margin: '0 auto'}), // Centering the button
+    ui.Panel(buttonFalseColour, null, {margin: '0 auto'}), // Centering the button
+    ui.Panel(buttonNDVI, null, {margin: '0 auto'}) // Centering the button
+  ]
+```
+
+Now we can add a little styling to the buttons and the slider to standardise their widths and make the label text a bit bigger.
+
+``` js
+buttonTrueColour.style().set({width: '300px'});
+buttonFalseColour.style().set({width: '300px'});
+buttonNDVI.style().set({width: '300px'});
+slider.style().set({width: '300px'});
+label.style().set('fontSize', '18px');
+```
+
+Now to make the UI a little cleaner we can hide the default map widgets which we don't need like this:
+
+```js
+//clear default map UI elements
+Map.setControlVisibility({all: false});
+```
+
+Voila! Now things are looking really nice.
+![Screenshot of the earth engine app UI with control panel](panel_UI.png)
+
+Now we have made an application that allows the user to easily view median landsat data for any year and for any location on earth and to choose if they want to visualise it in true colour, false colour or with NDVI; all without them having to write any code. Great, now we are ready to publish this as an earth engine app.
 
 ## Publishing an Earth Engine App
-In order to make our algorithms more accessible (including for users without them needing an Earth Engine account), we can publish our script as an Earth Engine app. 
+In order to make our algorithms more accessible (including for users without them needing an Earth Engine account), we can publish our script as an Earth Engine app.
+
+Begin by clicking the Apps button along the top ribbon of the main code panel. In the window that opens click the New App button. Proceed through the steps, set the permissions for who will be able to edit the app and choose a name for the app. Then choose the script you want the app to run on, keep it on "current contents of editor" to use the script that is currently open. You can then write a description for your app, and choose whether you would like it to appear in the Public Apps Gallery. You can also choose if you would want the app to only be viewable by people in a given Google Group (allowing you to controll which accounts can view it). A custom logo can also be also be upploaded if desired.
+
+Now simply click Publish the app. It may take a few minutes but your app will now be live and ready to use!
+
+![Image of the Earth Engine app open in its own browser tab](earth_engine_app.png)
+
+You can easily update the app if you want to make changes by simply changing the script and saving the changes. You can also edit other app parameters by clicking on the Apps button again and then clicking on the edit icon for your app. You can also overwrite your app's code with that from another script file if you so choose.
+
+Hopefully you can now build an earth engine app! If you want any more information check the useful links I've provided in the More Information section. There are also much more useful resources available online. Generative AI tools like ChatGPT and Gemini can also be useful for creating Earth Engine code but be wary, they will sometimes create code that doesn't work or even hallucinate functions that don't exist in Earth Engine. Use with caution!
+
+Finally, while I'm not an expert in Earth Engine, I can do my best to answer any queries.
+Email me at molni576@student.otago.ac.nz
 
 ## More Information
 There are many useful resources and tutorial videos about Google Earth engine available online. Here are a few useful general resources including official documentation and tutorial videos:
